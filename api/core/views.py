@@ -3,8 +3,9 @@ from rest_framework import viewsets, pagination, generics, filters
 from rest_framework.views import APIView
 from taggit.models import Tag
 
-from .serializers import PostSerializer, TagSerializer, ContactSerializer, RegisterSerializer, UserSerializer
-from .models import Post
+from .serializers import PostSerializer, TagSerializer, ContactSerializer, RegisterSerializer, UserSerializer, \
+    CommentSerializer
+from .models import Post, Comment
 from rest_framework.response import Response
 from rest_framework import permissions
 
@@ -69,5 +70,34 @@ class RegisterView(generics.GenericAPIView):
         user = serializer.save()
         return Response({
             "user": UserSerializer(user, context=self.get_serializer_context()).data,
-            "message": "Пользователь успшно создан!",
+            "message": "Пользователь успешно создан!",
         })
+
+
+class ProfileView(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UserSerializer
+
+    def get(self, request, *args, **kwargs):
+        return Response({
+            "user": UserSerializer(request.user, context=self.get_serializer_context()).data,
+        })
+
+
+class CommentView(generics.ListCreateAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        post_slug = self.kwargs['post_slug'].lower()
+        for slug in range(len(Post.objects.all())):
+            if str(Post.objects.all()[slug]).lower() == post_slug:
+                return Comment.objects.filter(post=slug + 1)
+        # post = Post.objects.get(slug=post_slug)
+        # return Comment.objects.filter(post=post)
+
+
+
+
+
