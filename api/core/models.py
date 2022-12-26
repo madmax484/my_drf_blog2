@@ -1,3 +1,5 @@
+import datetime
+
 from ckeditor_uploader.fields import RichTextUploadingField
 from django.contrib.auth.models import User
 from django.db import models
@@ -12,7 +14,7 @@ class Post(models.Model):
     description = RichTextUploadingField()
     content = RichTextUploadingField()
     image = models.ImageField()
-    created_at = models.DateField(default=timezone.now)
+    created_at = models.DateField(default=datetime.date.today())
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     tags = TaggableManager()
 
