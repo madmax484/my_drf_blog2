@@ -20,4 +20,11 @@ class TravelApiTestCase(APITestCase):
         serializer_data = PostSerializer([self.post1, self.post2], many=True).data
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(serializer_data, response.data['results'])
-        
+
+    def test_post(self):
+        url = reverse('posts-details')
+        response = self.client.post(url)
+
+        serializer_data = PostSerializer(self.post1)
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertEqual(serializer_data, response.data['results'])

@@ -4,8 +4,9 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from taggit.models import Tag
 
-from core.models import Post
-from core.serializers import PostSerializer, TagSerializer, ContactSerializer, RegisterSerializer
+from core.models import Post, Comment
+from core.serializers import PostSerializer, TagSerializer, ContactSerializer, RegisterSerializer, UserSerializer, \
+    CommentSerializer
 
 
 class PostSerializerTestCase(TestCase):
@@ -104,24 +105,50 @@ class RegisterSerializerTestCase(TestCase):
             'username': 'user',
             'password': '123',
             'password2': '123'
-        },
-        self.user1 = {
-            'username': 'user1',
-            'password': '321',
-            'password2': '321'
         }
     def test_register(self):
-        expected_data = [
-            {
+        expected_data = {
                 "username": 'user',
                 "password": '123',
                 "password2": '123'
-            },
-            {
-                "username": 'user1',
-                "password": '321',
-                "password2": '321'
             }
-        ]
-        data = RegisterSerializer([self.user])
-        print(data)
+        data = RegisterSerializer().create(self.user)
+        self.assertEqual(expected_data['username'], data.get_username())
+
+
+class UserSerializerTestCase(TestCase):
+    def setUp(self):
+        self.test_user = {
+            'username': 'user1',
+            'password': '123'
+        }
+    def test_user(self):
+        expected_data = {
+            'username': 'user1',
+            'last_login': None,
+            'password': '123'
+        }
+        data = UserSerializer(self.test_user).data
+        self.assertEqual(expected_data, data)
+
+
+class CommentSerializerTestCase(TestCase):
+    def setUp(self):
+        self.test_user = User.objects.create_user(username='test user')
+        self.post1 = Post.objects.create(h1='test post 1', title='post1', slug='post1', description='test',
+                                             content='user', author=self.test_user)
+        self.comment = CommentSerializer().create({'username': self.test_user, 'post': self.post1,
+                                             'text': 'text comment'})
+
+    def test_comment(self):
+        expected_data = {
+            'id': 1,
+            'username': 'test user',
+            'post': 'post1',
+            'text': 'text comment',
+            'created_date': datetime.date.today().strftime('%Y-%m-%d')
+        }
+        data = CommentSerializer(self.comment).data
+        self.assertEqual(expected_data, data)
+        self.assertEqual(1, Comment.objects.all().count())
+
