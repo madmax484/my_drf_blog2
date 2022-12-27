@@ -1,3 +1,5 @@
+import json
+
 from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
@@ -21,10 +23,19 @@ class TravelApiTestCase(APITestCase):
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(serializer_data, response.data['results'])
 
-    def test_post(self):
-        url = reverse('posts-details')
-        response = self.client.post(url)
+    def test_create(self):
+        url = reverse('posts-list')
+        data = {
+            'id': 1,
+            'h1': 'test post',
+            'title': 'test post',
+            'slug': 'test post',
+            'description': 'test1',
+            'content': 'user1',
+            'author': self.test_user
+        }
+        json_data = json.dumps(data)
+        self.client.force_login(self.test_user)
+        response = self.client.post(url, data=json_data, content_type='application/json')
 
-        serializer_data = PostSerializer(self.post1)
-        self.assertEqual(status.HTTP_200_OK, response.status_code)
-        self.assertEqual(serializer_data, response.data['results'])
+        self.assertEqual(status.HTTP_201_CREATED, response.status_code)
