@@ -13,7 +13,7 @@ class Post(models.Model):
     slug = models.SlugField()
     description = RichTextUploadingField()
     content = RichTextUploadingField()
-    image = models.ImageField()
+    image = models.ImageField(default=None)
     created_at = models.DateField(default=datetime.date.today())
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     tags = TaggableManager()
