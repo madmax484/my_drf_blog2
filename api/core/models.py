@@ -15,7 +15,8 @@ class Post(models.Model):
     content = RichTextUploadingField()
     image = models.ImageField(default=None)
     created_at = models.DateField(default=datetime.date.today())
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL,
+                               null=True)
     tags = TaggableManager()
 
     def __str__(self):

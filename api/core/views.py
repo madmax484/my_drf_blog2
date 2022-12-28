@@ -1,3 +1,4 @@
+
 from django.core.mail import send_mail
 from rest_framework import viewsets, pagination, generics, filters
 from rest_framework.views import APIView
@@ -21,8 +22,12 @@ class PostViewSet(viewsets.ModelViewSet):
     serializer_class = PostSerializer
     queryset = Post.objects.all()
     lookup_field = 'slug'
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     pagination_class = PageNumberSetPagination
+
+    def perform_create(self, serializer):
+        serializer.validated_data['author'] = self.request.user
+        serializer.save()
 
 class TagDetailView(generics.ListAPIView):
     serializer_class = PostSerializer
