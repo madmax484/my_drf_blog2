@@ -4,6 +4,7 @@ from rest_framework import viewsets, pagination, generics, filters
 from rest_framework.views import APIView
 from taggit.models import Tag
 
+from .permissions import IsAuthorOrStaffOrReadOnly
 from .serializers import PostSerializer, TagSerializer, ContactSerializer, RegisterSerializer, UserSerializer, \
     CommentSerializer
 from .models import Post, Comment
@@ -22,7 +23,7 @@ class PostViewSet(viewsets.ModelViewSet):
     serializer_class = PostSerializer
     queryset = Post.objects.all()
     lookup_field = 'slug'
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthorOrStaffOrReadOnly]
     pagination_class = PageNumberSetPagination
 
     def perform_create(self, serializer):
