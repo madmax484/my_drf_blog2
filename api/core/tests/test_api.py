@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework.exceptions import ErrorDetail
 from rest_framework.test import APITestCase
 
-from core.models import Post
+from core.models import Post, UserPostRelation
 from core.serializers import PostSerializer
 
 
@@ -156,3 +156,59 @@ class TravelApiTestCase(APITestCase):
         response = self.client.delete(url, data=json_data, content_type="application/json")
         self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
         self.assertEqual(1, Post.objects.all().count())
+
+class PostsRelationApiTestCase(APITestCase):
+    def setUp(self):
+        self.test_user = User.objects.create(username="test_user")
+        self.test_user2 = User.objects.create(username="test_user2")
+        self.post1 = Post.objects.create(h1='test post 1', title='post1', slug='post1', description='test',
+                                         content='user', author=self.test_user)
+        self.post2 = Post.objects.create(h1='test post 2', title='post2', slug='post2', description='test1',
+                                         content='user1')
+    def test_like(self):
+        url = reverse('userpostrelation-detail', args=(self.post1.id,))
+
+        data = {
+            "like": True
+        }
+        json_data = json.dumps(data)
+        self.client.force_authenticate(self.test_user)
+        response = self.client.patch(url, data=json_data, content_type="application/json")
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        relations = UserPostRelation.objects.get(user=self.test_user, post=self.post1)
+        self.assertTrue(relations.like)
+
+        data = {
+            "is_favorites": True
+        }
+        json_data = json.dumps(data)
+        response = self.client.patch(url, data=json_data, content_type="application/json")
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        relations = UserPostRelation.objects.get(user=self.test_user, post=self.post1)
+        self.assertTrue(relations.is_favorites)
+
+    def test_rate(self):
+        url = reverse('userpostrelation-detail', args=(self.post1.id,))
+
+        data = {
+            "rate": 2
+        }
+        json_data = json.dumps(data)
+        self.client.force_authenticate(self.test_user)
+        response = self.client.patch(url, data=json_data, content_type="application/json")
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        relations = UserPostRelation.objects.get(user=self.test_user, post=self.post1)
+        self.assertEqual(2, relations.rate)
+
+    def test_rate_wrong(self):
+        url = reverse('userpostrelation-detail', args=(self.post1.id,))
+
+        data = {
+            "rate": 6
+        }
+        json_data = json.dumps(data)
+        self.client.force_authenticate(self.test_user)
+        response = self.client.patch(url, data=json_data, content_type="application/json")
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+        relations = UserPostRelation.objects.get(user=self.test_user, post=self.post1)
+        self.assertEqual(None, relations.rate)

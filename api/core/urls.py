@@ -2,10 +2,13 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-from .views import PostViewSet, TagDetailView, TagView, AsideView, FeedBackView, RegisterView, ProfileView, CommentView
+from .views import PostViewSet, TagDetailView, TagView, AsideView, FeedBackView, RegisterView, ProfileView, CommentView, \
+    UserPostRelationView
 
 router = DefaultRouter()
 router.register('posts', PostViewSet, basename='posts')
+router.register(r'posts_relations', UserPostRelationView)
+
 
 
 

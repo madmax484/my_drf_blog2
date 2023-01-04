@@ -16,7 +16,9 @@ class Post(models.Model):
     image = models.ImageField(default=None)
     created_at = models.DateField(default=datetime.date.today())
     author = models.ForeignKey(User, on_delete=models.SET_NULL,
-                               null=True)
+                               null=True, related_name='my_posts')
+    appreciated = models.ManyToManyField(User, through='UserPostRelation',
+                                         related_name='posts')
     tags = TaggableManager()
 
     def __str__(self):
@@ -34,3 +36,22 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.text
+
+class UserPostRelation(models.Model):
+    RATE_CHOICES = (
+        (1, 'Bad'),
+        (2, 'Not bad'),
+        (3, 'Normal'),
+        (4, 'Good'),
+        (5, 'Very good')
+    )
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    like = models.BooleanField(default=False)
+    is_favorites = models.BooleanField(default=False)
+    rate = models.PositiveSmallIntegerField(choices=RATE_CHOICES, null=True)
+
+    def __str__(self):
+        return f'{self.user.username}: {self.post.title}, RATE {self.rate}'
+

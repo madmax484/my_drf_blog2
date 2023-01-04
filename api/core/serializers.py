@@ -1,7 +1,8 @@
 from rest_framework import serializers
+from rest_framework.serializers import ModelSerializer
 from taggit.models import Tag
 
-from .models import Post, Comment
+from .models import Post, Comment, UserPostRelation
 from taggit_serializer.serializers import TagListSerializerField, TaggitSerializer
 from django.contrib.auth.models import User
 
@@ -79,3 +80,7 @@ class CommentSerializer(serializers.ModelSerializer):
             'url': {'lookup_field': 'id'}
         }
 
+class UserPostRelationSerializer(ModelSerializer):
+    class Meta:
+        model = UserPostRelation
+        fields = ('post', 'like', 'is_favorites', 'rate')

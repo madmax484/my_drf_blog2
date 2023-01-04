@@ -1,13 +1,16 @@
 
 from django.core.mail import send_mail
 from rest_framework import viewsets, pagination, generics, filters
+from rest_framework.mixins import UpdateModelMixin
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
+from rest_framework.viewsets import GenericViewSet
 from taggit.models import Tag
 
 from .permissions import IsAuthorOrStaffOrReadOnly
 from .serializers import PostSerializer, TagSerializer, ContactSerializer, RegisterSerializer, UserSerializer, \
-    CommentSerializer
-from .models import Post, Comment
+    CommentSerializer, UserPostRelationSerializer
+from .models import Post, Comment, UserPostRelation
 from rest_framework.response import Response
 from rest_framework import permissions
 
@@ -103,7 +106,14 @@ class CommentView(generics.ListCreateAPIView):
         # post = Post.objects.get(slug=post_slug)
         # return Comment.objects.filter(post=post)
 
+class UserPostRelationView(UpdateModelMixin, GenericViewSet):
+    permission_classes = [IsAuthenticated]
+    queryset = UserPostRelation.objects.all()
+    serializer_class = UserPostRelationSerializer
+    lookup_field = 'post'
 
-
-
+    def get_object(self):
+        obj, created = UserPostRelation.objects.get_or_create(user=self.request.user,
+                                                        post_id=self.kwargs['post'])
+        return obj
 
