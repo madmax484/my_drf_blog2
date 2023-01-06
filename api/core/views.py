@@ -1,5 +1,6 @@
 
 from django.core.mail import send_mail
+from django.db.models import Count, Case, When, Avg
 from rest_framework import viewsets, pagination, generics, filters
 from rest_framework.mixins import UpdateModelMixin
 from rest_framework.permissions import IsAuthenticated
@@ -24,7 +25,9 @@ class PostViewSet(viewsets.ModelViewSet):
     search_fields = ['$content', '$h1']
     filter_backends = (filters.SearchFilter,)
     serializer_class = PostSerializer
-    queryset = Post.objects.all()
+    queryset = Post.objects.all().annotate(annotated_likes=Count(Case(When(userpostrelation__like=True, then=1))),
+                                            rating=Avg('userpostrelation__rate')
+                                            )
     lookup_field = 'slug'
     permission_classes = [IsAuthorOrStaffOrReadOnly]
     pagination_class = PageNumberSetPagination

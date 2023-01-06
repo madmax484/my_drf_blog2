@@ -21,7 +21,9 @@ class PostSerializer(TaggitSerializer, serializers.ModelSerializer):
 
     tags = TagSerializer(many=True, read_only=True)
     author = serializers.SlugRelatedField(slug_field="username", queryset=User.objects.all())
-
+    like_count = serializers.SerializerMethodField()
+    annotated_likes = serializers.IntegerField(read_only=True)
+    rating = serializers.DecimalField(max_digits=3, decimal_places=2, read_only=True)
     class Meta:
         model = Post
         fields = '__all__'
@@ -29,6 +31,9 @@ class PostSerializer(TaggitSerializer, serializers.ModelSerializer):
         extra_kwargs = {
             'url': {'lookup_field': 'slug'}
         }
+
+    def get_like_count(self, instance):
+        return UserPostRelation.objects.filter(post=instance, like=True).count()
 
 class ContactSerializer(serializers.Serializer):
     name = serializers.CharField()

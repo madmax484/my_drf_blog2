@@ -1,6 +1,7 @@
 import json
 
 from django.contrib.auth.models import User
+from django.db.models import Count, Case, When, Avg
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.exceptions import ErrorDetail
@@ -17,12 +18,21 @@ class TravelApiTestCase(APITestCase):
                                          content='user', author=self.test_user)
         self.post2 = Post.objects.create(h1='test post 2', title='post2', slug='post2', description='test1',
                                          content='user1')
+        UserPostRelation.objects.create(user=self.test_user, post=self.post1, like=True, rate=4)
+
     def test_get(self):
         url = reverse('posts-list')
+
         response = self.client.get(url)
-        serializer_data = PostSerializer([self.post1, self.post2], many=True).data
+        posts = Post.objects.all().annotate(annotated_likes=Count(Case(When(userpostrelation__like=True, then=1))),
+                                            rating=Avg('userpostrelation__rate')
+                                            )
+        serializer_data = PostSerializer(posts, many=True).data
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(serializer_data, response.data['results'])
+        self.assertEqual(serializer_data[1]['rating'], '4.00')
+        self.assertEqual(serializer_data[1]['like_count'], 1)
+        self.assertEqual(serializer_data[1]['annotated_likes'], 1)
 
     def test_create(self):
         self.assertEqual(2, Post.objects.all().count())

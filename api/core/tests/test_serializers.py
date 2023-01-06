@@ -1,10 +1,11 @@
 import datetime
 
 from django.contrib.auth.models import User
+from django.db.models import Count, Case, When, Avg
 from django.test import TestCase
 from taggit.models import Tag
 
-from core.models import Post, Comment
+from core.models import Post, Comment, UserPostRelation
 from core.serializers import PostSerializer, TagSerializer, ContactSerializer, RegisterSerializer, UserSerializer, \
     CommentSerializer
 
@@ -12,12 +13,27 @@ from core.serializers import PostSerializer, TagSerializer, ContactSerializer, R
 class PostSerializerTestCase(TestCase):
     def setUp(self):
         self.test_user = User.objects.create_user('user')
+        self.test_user2 = User.objects.create_user('user2')
+        self.test_user3 = User.objects.create_user('user3')
+
         self.post1 = Post.objects.create(h1='test post 1', title='post1', slug='post1', description='test',
                                          content='user', author=self.test_user)
         self.post2 = Post.objects.create(h1='test post 2', title='post2', slug='post2', description='test1',
                                          content='user1', author=self.test_user)
+
+        UserPostRelation.objects.create(user=self.test_user, post=self.post1, like=True, rate=4)
+        UserPostRelation.objects.create(user=self.test_user2, post=self.post1, like=True, rate=4)
+        UserPostRelation.objects.create(user=self.test_user3, post=self.post1, like=False, rate=5)
+
+        UserPostRelation.objects.create(user=self.test_user, post=self.post2, like=True)
+        UserPostRelation.objects.create(user=self.test_user2, post=self.post2, like=False, rate=4)
+        UserPostRelation.objects.create(user=self.test_user3, post=self.post2, like=False)
+
     def test_ok(self):
-        data = PostSerializer([self.post1, self.post2], many=True).data
+        posts = Post.objects.all().annotate(annotated_likes=Count(Case(When(userpostrelation__like=True, then=1))),
+                                            rating=Avg('userpostrelation__rate')
+                                            )
+        data = PostSerializer(posts, many=True).data
         expected_data = [
             {
                 'id': self.post1.id,
@@ -28,8 +44,12 @@ class PostSerializerTestCase(TestCase):
                 'content': 'user',
                 'image': None,
                 'created_at': datetime.date.today().strftime('%Y-%m-%d'),
+                'appreciated': [1, 2, 3],
                 'author': 'user',
-                'tags': []
+                'tags': [],
+                'like_count': 2,
+                'annotated_likes': 2,
+                'rating': '4.33'
             },
             {
                 'id': self.post2.id,
@@ -40,8 +60,12 @@ class PostSerializerTestCase(TestCase):
                 'content': 'user1',
                 'image': None,
                 'created_at': datetime.date.today().strftime('%Y-%m-%d'),
+                'appreciated': [1, 2, 3],
                 'author': 'user',
-                'tags': []
+                'tags': [],
+                'like_count': 1,
+                'annotated_likes': 1,
+                'rating': '4.00'
             }
         ]
         self.assertEqual(expected_data, data)
