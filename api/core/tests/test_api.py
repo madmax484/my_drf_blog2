@@ -1,8 +1,11 @@
 import json
 
 from django.contrib.auth.models import User
+from django.db import connection
 from django.db.models import Count, Case, When, Avg
 from django.urls import reverse
+from django.test.utils import CaptureQueriesContext
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.exceptions import ErrorDetail
 from rest_framework.test import APITestCase
@@ -23,8 +26,9 @@ class TravelApiTestCase(APITestCase):
     def test_get(self):
         url = reverse('posts-list')
 
-        # with CaptureQueriesContext
-        response = self.client.get(url)
+        with CaptureQueriesContext(connection) as queries:
+            response = self.client.get(url)
+            self.assertEqual(4, len(queries))
         posts = Post.objects.all().annotate(annotated_likes=Count(Case(When(userpostrelation__like=True, then=1))),
                                             rating=Avg('userpostrelation__rate')
                                             ).order_by('id')
@@ -44,6 +48,7 @@ class TravelApiTestCase(APITestCase):
             "slug": "test_post",
             "description": "test1",
             "content": "user1",
+            'created_at': str(timezone.localdate()),
             "author": self.test_user.username
         }
         json_data = json.dumps(data)

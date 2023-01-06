@@ -3,6 +3,7 @@ import datetime
 from django.contrib.auth.models import User
 from django.db.models import Count, Case, When, Avg
 from django.test import TestCase
+from django.utils import timezone
 from taggit.models import Tag
 
 from core.models import Post, Comment, UserPostRelation
@@ -46,7 +47,7 @@ class PostSerializerTestCase(TestCase):
                 'description': 'test',
                 'content': 'user',
                 'image': None,
-                'created_at': datetime.date.today().strftime('%Y-%m-%d'),
+                'created_at': str(timezone.localdate()),
                 'appreciated': [
                     {
                         'first_name': 'Mark',
@@ -75,7 +76,7 @@ class PostSerializerTestCase(TestCase):
                 'description': 'test1',
                 'content': 'user1',
                 'image': None,
-                'created_at': datetime.date.today().strftime('%Y-%m-%d'),
+                'created_at': str(timezone.localdate()),
                 'appreciated': [
                     {
                         'first_name': 'Mark',
