@@ -23,16 +23,17 @@ class TravelApiTestCase(APITestCase):
     def test_get(self):
         url = reverse('posts-list')
 
+        # with CaptureQueriesContext
         response = self.client.get(url)
         posts = Post.objects.all().annotate(annotated_likes=Count(Case(When(userpostrelation__like=True, then=1))),
                                             rating=Avg('userpostrelation__rate')
-                                            )
+                                            ).order_by('id')
         serializer_data = PostSerializer(posts, many=True).data
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(serializer_data, response.data['results'])
-        self.assertEqual(serializer_data[1]['rating'], '4.00')
-        self.assertEqual(serializer_data[1]['like_count'], 1)
-        self.assertEqual(serializer_data[1]['annotated_likes'], 1)
+        self.assertEqual(serializer_data[0]['rating'], '4.00')
+        # self.assertEqual(serializer_data[1]['like_count'], 1)
+        self.assertEqual(serializer_data[0]['annotated_likes'], 1)
 
     def test_create(self):
         self.assertEqual(2, Post.objects.all().count())

@@ -27,7 +27,7 @@ class PostViewSet(viewsets.ModelViewSet):
     serializer_class = PostSerializer
     queryset = Post.objects.all().annotate(annotated_likes=Count(Case(When(userpostrelation__like=True, then=1))),
                                             rating=Avg('userpostrelation__rate')
-                                            )
+                                            ).select_related('author').prefetch_related('appreciated', 'tags')
     lookup_field = 'slug'
     permission_classes = [IsAuthorOrStaffOrReadOnly]
     pagination_class = PageNumberSetPagination

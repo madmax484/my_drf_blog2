@@ -22,4 +22,6 @@ urlpatterns = [
     path('profile/', ProfileView.as_view()),
     path("comments/", CommentView.as_view()),
     path("comments/<slug:post_slug>/", CommentView.as_view()),
+
+    path('__debug__/', include('debug_toolbar.urls')),
 ]

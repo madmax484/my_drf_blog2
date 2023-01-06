@@ -12,9 +12,12 @@ from core.serializers import PostSerializer, TagSerializer, ContactSerializer, R
 
 class PostSerializerTestCase(TestCase):
     def setUp(self):
-        self.test_user = User.objects.create_user('user')
-        self.test_user2 = User.objects.create_user('user2')
-        self.test_user3 = User.objects.create_user('user3')
+        self.test_user = User.objects.create_user(username='user',
+                                                  first_name='Mark', last_name='Shagal')
+        self.test_user2 = User.objects.create_user(username='user2',
+                                                  first_name='Mark', last_name='Ivanov')
+        self.test_user3 = User.objects.create_user(username='user3',
+                                                  first_name='Ivan', last_name='Markov')
 
         self.post1 = Post.objects.create(h1='test post 1', title='post1', slug='post1', description='test',
                                          content='user', author=self.test_user)
@@ -44,10 +47,23 @@ class PostSerializerTestCase(TestCase):
                 'content': 'user',
                 'image': None,
                 'created_at': datetime.date.today().strftime('%Y-%m-%d'),
-                'appreciated': [1, 2, 3],
+                'appreciated': [
+                    {
+                        'first_name': 'Mark',
+                        'last_name': 'Shagal'
+                    },
+                    {
+                        'first_name': 'Mark',
+                        'last_name': 'Ivanov'
+                    },
+                    {
+                        'first_name': 'Ivan',
+                        'last_name': 'Markov'
+                    }
+                ],
                 'author': 'user',
                 'tags': [],
-                'like_count': 2,
+                # 'like_count': 2,
                 'annotated_likes': 2,
                 'rating': '4.33'
             },
@@ -60,10 +76,23 @@ class PostSerializerTestCase(TestCase):
                 'content': 'user1',
                 'image': None,
                 'created_at': datetime.date.today().strftime('%Y-%m-%d'),
-                'appreciated': [1, 2, 3],
+                'appreciated': [
+                    {
+                        'first_name': 'Mark',
+                        'last_name': 'Shagal'
+                    },
+                    {
+                        'first_name': 'Mark',
+                        'last_name': 'Ivanov'
+                    },
+                    {
+                        'first_name': 'Ivan',
+                        'last_name': 'Markov'
+                    }
+                ],
                 'author': 'user',
                 'tags': [],
-                'like_count': 1,
+                # 'like_count': 1,
                 'annotated_likes': 1,
                 'rating': '4.00'
             }
