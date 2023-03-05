@@ -1,6 +1,7 @@
-
+from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.db.models import Count, Case, When, Avg
+from django.views.generic import ListView
 from rest_framework import viewsets, pagination, generics, filters
 from rest_framework.mixins import UpdateModelMixin
 from rest_framework.permissions import IsAuthenticated
@@ -95,7 +96,6 @@ class ProfileView(generics.GenericAPIView):
             "user": UserSerializer(request.user, context=self.get_serializer_context()).data,
         })
 
-
 class CommentView(generics.ListCreateAPIView):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
@@ -120,3 +120,6 @@ class UserPostRelationView(UpdateModelMixin, GenericViewSet):
                                                         post_id=self.kwargs['post'])
         return obj
 
+class FavoritesView(generics.ListAPIView):
+    queryset = UserPostRelation.objects.filter(is_favorites=True)
+    serializer_class = UserPostRelationSerializer

@@ -58,8 +58,6 @@ class TravelApiTestCase(APITestCase):
         self.assertEqual(self.test_user, Post.objects.last().author)
         self.assertEqual(3, Post.objects.all().count())
 
-
-
     def test_update(self):
         url = reverse('posts-detail', args=(self.post1.slug,))
         data = {
@@ -112,7 +110,7 @@ class TravelApiTestCase(APITestCase):
         self.post1.refresh_from_db()
         self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
         self.assertEqual({'detail': ErrorDetail(string='У вас недостаточно прав для выполнения данного действия.',
-                                     code='permission_denied')}, response.data)
+                                                code='permission_denied')}, response.data)
         self.assertEqual(2, Post.objects.all().count())
         self.assertEqual('test', self.post1.description)
 
@@ -152,7 +150,7 @@ class TravelApiTestCase(APITestCase):
         response = self.client.delete(url, data=json_data, content_type="application/json")
         self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
         self.assertEqual({'detail': ErrorDetail(string='У вас недостаточно прав для выполнения данного действия.',
-                                     code='permission_denied')}, response.data)
+                                                code='permission_denied')}, response.data)
         self.assertEqual(2, Post.objects.all().count())
 
     def test_delete_not_author_but_staff(self):
@@ -173,6 +171,7 @@ class TravelApiTestCase(APITestCase):
         self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
         self.assertEqual(1, Post.objects.all().count())
 
+
 class PostsRelationApiTestCase(APITestCase):
     def setUp(self):
         self.test_user = User.objects.create(username="test_user")
@@ -181,6 +180,7 @@ class PostsRelationApiTestCase(APITestCase):
                                          content='user', author=self.test_user)
         self.post2 = Post.objects.create(h1='test post 2', title='post2', slug='post2', description='test1',
                                          content='user1')
+
     def test_like(self):
         url = reverse('userpostrelation-detail', args=(self.post1.id,))
 

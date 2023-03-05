@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
 
     'rest_framework',
-    'core',
+    'core.apps.CoreConfig',
     'ckeditor',
     'ckeditor_uploader',
     'taggit',

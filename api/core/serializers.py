@@ -95,4 +95,4 @@ class CommentSerializer(serializers.ModelSerializer):
 class UserPostRelationSerializer(ModelSerializer):
     class Meta:
         model = UserPostRelation
-        fields = ('post', 'like', 'is_favorites', 'rate')
+        fields = ('user', 'post', 'like', 'is_favorites', 'rate')

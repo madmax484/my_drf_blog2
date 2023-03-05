@@ -14,7 +14,7 @@ class Post(models.Model):
     description = RichTextUploadingField()
     content = RichTextUploadingField()
     image = models.ImageField(default=None)
-    created_at = models.DateField(default=timezone.now())
+    created_at = models.DateField(default=timezone.now)
     author = models.ForeignKey(User, on_delete=models.SET_NULL,
                                null=True, related_name='my_posts')
     appreciated = models.ManyToManyField(User, through='UserPostRelation',
@@ -29,7 +29,7 @@ class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
     username = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_name')
     text = models.TextField()
-    created_date = models.DateField(default=datetime.date.today())
+    created_date = models.DateField(default=datetime.datetime)
 
     class Meta:
         ordering = ['-created_date']
