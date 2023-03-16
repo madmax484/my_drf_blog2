@@ -1,4 +1,3 @@
-
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
@@ -8,8 +7,6 @@ from .views import PostViewSet, TagDetailView, TagView, AsideView, FeedBackView,
 router = DefaultRouter()
 router.register('posts', PostViewSet, basename='posts')
 router.register(r'posts_relations', UserPostRelationView)
-
-
 
 
 urlpatterns = [
@@ -23,8 +20,6 @@ urlpatterns = [
     path("comments/", CommentView.as_view()),
     path("comments/<slug:post_slug>/", CommentView.as_view()),
     path("favorites/", FavoritesView.as_view()),
-
     path('', include('social_django.urls', namespace='social')),
-
     path('__debug__/', include('debug_toolbar.urls')),
 ]
