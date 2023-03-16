@@ -18,11 +18,13 @@ from rest_framework import permissions
 
 
 class PageNumberSetPagination(pagination.PageNumberPagination):
+    """Пагинация"""
     page_size = 6
     page_query_param = 'page_size'
     ordering = 'created_at'
 
 class PostViewSet(viewsets.ModelViewSet):
+    """Посты"""
     search_fields = ['$content', '$h1']
     filter_backends = (filters.SearchFilter,)
     serializer_class = PostSerializer
@@ -38,6 +40,7 @@ class PostViewSet(viewsets.ModelViewSet):
         serializer.save()
 
 class TagDetailView(generics.ListAPIView):
+    """Тэг"""
     serializer_class = PostSerializer
     pagination_class = PageNumberSetPagination
     permission_classes = [permissions.AllowAny]
@@ -48,16 +51,19 @@ class TagDetailView(generics.ListAPIView):
         return Post.objects.filter(tags=tag)
 
 class TagView(generics.ListAPIView):
+    """Список тэгов"""
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_classes = [permissions.AllowAny]
 
 class AsideView(generics.ListAPIView):
+    """Правая сторона страницы"""
     queryset = Post.objects.all().order_by('-id')[:5]
     serializer_class = PostSerializer
     permission_classes = [permissions.AllowAny]
 
 class FeedBackView(APIView):
+    """Обратная связь"""
     permission_classes = [permissions.AllowAny]
     serializer_class = ContactSerializer
 
@@ -74,6 +80,7 @@ class FeedBackView(APIView):
 
 
 class RegisterView(generics.GenericAPIView):
+    """Регистрация"""
     permission_classes = [permissions.AllowAny]
     serializer_class = RegisterSerializer
 
@@ -88,6 +95,7 @@ class RegisterView(generics.GenericAPIView):
 
 
 class ProfileView(generics.GenericAPIView):
+    """Профиль пользователя"""
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = UserSerializer
 
@@ -97,6 +105,7 @@ class ProfileView(generics.GenericAPIView):
         })
 
 class CommentView(generics.ListCreateAPIView):
+    """Комментарии"""
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = [permissions.AllowAny]
@@ -110,6 +119,7 @@ class CommentView(generics.ListCreateAPIView):
         # return Comment.objects.filter(post=post)
 
 class UserPostRelationView(UpdateModelMixin, GenericViewSet):
+    """Оценка поста"""
     permission_classes = [IsAuthenticated]
     queryset = UserPostRelation.objects.all()
     serializer_class = UserPostRelationSerializer
@@ -121,5 +131,6 @@ class UserPostRelationView(UpdateModelMixin, GenericViewSet):
         return obj
 
 class FavoritesView(generics.ListAPIView):
+    """Избранное"""
     queryset = UserPostRelation.objects.filter(is_favorites=True)
     serializer_class = UserPostRelationSerializer
