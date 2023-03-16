@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 
 
 class TagSerializer(serializers.ModelSerializer):
-
+    """Серриалайзер тэгов"""
     class Meta:
         model = Tag
         fields = ("name", "slug")
@@ -18,6 +18,7 @@ class TagSerializer(serializers.ModelSerializer):
         }
 
 class PostAppreciatedSerializer(ModelSerializer):
+    """Сериалайзер оценки поста"""
     class Meta:
         model = User
         fields = ('first_name', 'last_name')
