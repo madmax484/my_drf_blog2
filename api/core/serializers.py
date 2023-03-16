@@ -24,7 +24,7 @@ class PostAppreciatedSerializer(ModelSerializer):
         fields = ('first_name', 'last_name')
 
 class PostSerializer(TaggitSerializer, serializers.ModelSerializer):
-
+    """Сериалайзер поста"""
     tags = TagSerializer(many=True, read_only=True)
     # author = serializers.SlugRelatedField(slug_field="username", queryset=User.objects.all())
     author = serializers.CharField(source='author.username', default='', read_only=True)
@@ -51,7 +51,7 @@ class ContactSerializer(serializers.Serializer):
 
 
 class RegisterSerializer(serializers.ModelSerializer):
-
+    """Сериалайзер регистрации"""
     password2 = serializers.CharField(write_only=True)
 
     class Meta:
@@ -76,12 +76,14 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    """Сериалайзер пользователя"""
     class Meta:
         model = User
         fields = '__all__'
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    """Сериалайзер комментариев"""
     username = serializers.SlugRelatedField(slug_field="username", queryset=User.objects.all())
     post = serializers.SlugRelatedField(slug_field="slug", queryset=Post.objects.all())
 
@@ -94,6 +96,7 @@ class CommentSerializer(serializers.ModelSerializer):
         }
 
 class UserPostRelationSerializer(ModelSerializer):
+    """Сериалайзер оценки поста"""
     class Meta:
         model = UserPostRelation
         fields = ('user', 'post', 'like', 'is_favorites', 'rate')
