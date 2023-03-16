@@ -8,6 +8,7 @@ from taggit.managers import TaggableManager
 
 
 class Post(models.Model):
+    """Модель поста"""
     h1 = models.CharField(max_length=200)
     title = models.CharField(max_length=200)
     slug = models.SlugField()
@@ -26,6 +27,7 @@ class Post(models.Model):
 
 
 class Comment(models.Model):
+    """Модель комментариев"""
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
     username = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_name')
     text = models.TextField()
@@ -38,6 +40,7 @@ class Comment(models.Model):
         return self.text
 
 class UserPostRelation(models.Model):
+    """Модель рэйтинга"""
     RATE_CHOICES = (
         (1, 'Bad'),
         (2, 'Not bad'),
