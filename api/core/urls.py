@@ -8,7 +8,6 @@ router = DefaultRouter()
 router.register('posts', PostViewSet, basename='posts')
 router.register(r'posts_relations', UserPostRelationView)
 
-
 urlpatterns = [
     path("", include(router.urls)),
     path("tags/", TagView.as_view()),

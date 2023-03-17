@@ -1,7 +1,6 @@
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.db.models import Count, Case, When, Avg
-from django.views.generic import ListView
 from rest_framework import viewsets, pagination, generics, filters
 from rest_framework.mixins import UpdateModelMixin
 from rest_framework.permissions import IsAuthenticated
@@ -23,14 +22,15 @@ class PageNumberSetPagination(pagination.PageNumberPagination):
     page_query_param = 'page_size'
     ordering = 'created_at'
 
+
 class PostViewSet(viewsets.ModelViewSet):
     """Посты"""
     search_fields = ['$content', '$h1']
     filter_backends = (filters.SearchFilter,)
     serializer_class = PostSerializer
     queryset = Post.objects.all().annotate(annotated_likes=Count(Case(When(userpostrelation__like=True, then=1))),
-                                            rating=Avg('userpostrelation__rate')
-                                            ).select_related('author').prefetch_related('appreciated', 'tags')
+                                           rating=Avg('userpostrelation__rate')
+                                           ).select_related('author').prefetch_related('appreciated', 'tags')
     lookup_field = 'slug'
     permission_classes = [IsAuthorOrStaffOrReadOnly]
     pagination_class = PageNumberSetPagination
@@ -38,6 +38,7 @@ class PostViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.validated_data['author'] = self.request.user
         serializer.save()
+
 
 class TagDetailView(generics.ListAPIView):
     """Тэг"""
@@ -50,17 +51,20 @@ class TagDetailView(generics.ListAPIView):
         tag = Tag.objects.get(slug=tag_slug)
         return Post.objects.filter(tags=tag)
 
+
 class TagView(generics.ListAPIView):
     """Список тэгов"""
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_classes = [permissions.AllowAny]
 
+
 class AsideView(generics.ListAPIView):
     """Правая сторона страницы"""
     queryset = Post.objects.all().order_by('-id')[:5]
     serializer_class = PostSerializer
     permission_classes = [permissions.AllowAny]
+
 
 class FeedBackView(APIView):
     """Обратная связь"""
@@ -104,6 +108,7 @@ class ProfileView(generics.GenericAPIView):
             "user": UserSerializer(request.user, context=self.get_serializer_context()).data,
         })
 
+
 class CommentView(generics.ListCreateAPIView):
     """Комментарии"""
     queryset = Comment.objects.all()
@@ -115,8 +120,7 @@ class CommentView(generics.ListCreateAPIView):
         for slug in range(len(Post.objects.all())):
             if str(Post.objects.all()[slug]).lower() == post_slug:
                 return Comment.objects.filter(post=slug + 1)
-        # post = Post.objects.get(slug=post_slug)
-        # return Comment.objects.filter(post=post)
+
 
 class UserPostRelationView(UpdateModelMixin, GenericViewSet):
     """Оценка поста"""
@@ -127,8 +131,9 @@ class UserPostRelationView(UpdateModelMixin, GenericViewSet):
 
     def get_object(self):
         obj, created = UserPostRelation.objects.get_or_create(user=self.request.user,
-                                                        post_id=self.kwargs['post'])
+                                                              post_id=self.kwargs['post'])
         return obj
+
 
 class FavoritesView(generics.ListAPIView):
     """Избранное"""

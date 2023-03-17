@@ -9,6 +9,7 @@ class PostAdmin(admin.ModelAdmin):
 
 admin.site.register(Post, PostAdmin)
 
+
 @admin.register(UserPostRelation)
 class UserPostRelationAdmin(admin.ModelAdmin):
     pass

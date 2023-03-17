@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 
 class TagSerializer(serializers.ModelSerializer):
     """Серриалайзер тэгов"""
+
     class Meta:
         model = Tag
         fields = ("name", "slug")
@@ -17,11 +18,14 @@ class TagSerializer(serializers.ModelSerializer):
             'url': {'lookup_field': 'name'}
         }
 
+
 class PostAppreciatedSerializer(ModelSerializer):
     """Сериалайзер оценки поста"""
+
     class Meta:
         model = User
         fields = ('first_name', 'last_name')
+
 
 class PostSerializer(TaggitSerializer, serializers.ModelSerializer):
     """Сериалайзер поста"""
@@ -32,6 +36,7 @@ class PostSerializer(TaggitSerializer, serializers.ModelSerializer):
     annotated_likes = serializers.IntegerField(read_only=True)
     rating = serializers.DecimalField(max_digits=3, decimal_places=2, read_only=True)
     appreciated = PostAppreciatedSerializer(many=True, read_only=True)
+
     class Meta:
         model = Post
         fields = '__all__'
@@ -42,6 +47,7 @@ class PostSerializer(TaggitSerializer, serializers.ModelSerializer):
 
     # def get_like_count(self, instance):
     #     return UserPostRelation.objects.filter(post=instance, like=True).count()
+
 
 class ContactSerializer(serializers.Serializer):
     name = serializers.CharField()
@@ -77,6 +83,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     """Сериалайзер пользователя"""
+
     class Meta:
         model = User
         fields = '__all__'
@@ -95,8 +102,10 @@ class CommentSerializer(serializers.ModelSerializer):
             'url': {'lookup_field': 'id'}
         }
 
+
 class UserPostRelationSerializer(ModelSerializer):
     """Сериалайзер оценки поста"""
+
     class Meta:
         model = UserPostRelation
         fields = ('user', 'post', 'like', 'is_favorites', 'rate')

@@ -39,6 +39,7 @@ class Comment(models.Model):
     def __str__(self):
         return self.text
 
+
 class UserPostRelation(models.Model):
     """Модель рэйтинга"""
     RATE_CHOICES = (
@@ -57,4 +58,3 @@ class UserPostRelation(models.Model):
 
     def __str__(self):
         return f'{self.user.username}: {self.post.title}, RATE {self.rate}'
-
